@@ -140,32 +140,40 @@ def get_dir_name_shear(g):
     return dir_name
 
 
-def check_avail(prog):
+def check_avail(prog, verbose=False):
     """Check availability of library or executable.
 
     Parameters
     ----------
     prog: hash array
-       library or command name and type
+        library or command name and type
+    verbose: bool, optional, default=False
+        verbose output if True
 
     Returns
     ------- 
     res: bool
-       True if available
+        True if available
     """
 
     if prog['type'] == 'cmd':
 
         import distutils.spawn
+        str = 'executable program \'{}\''.format(prog['name'])
         if not distutils.spawn.find_executable(prog['name']):
-            raise OSError('executable program \'{}\' not found'.format(prog['name']))
+            raise OSError('{} not found'.format(str))
+        if verbose:
+            print('{} found'.format(str))
 
     elif prog['type'] == 'py':
 
+        str = 'library \'{}\''.format(prog['name'])
         try:
             __import__(prog['name']) 
         except ModuleNotFoundError as e:
-            raise 'Library not found'
+            raise '{} not found'.format(str)
+        if verbose:
+            print('{} found'.format(str))
 
     else:
         raise 'Unknown type'
